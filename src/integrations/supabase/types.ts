@@ -14,7 +14,263 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cases: {
+        Row: {
+          additional_notes: string
+          case_id: string
+          concept: string
+          created_at: string
+          device_info: string
+          expected_fault: string
+          id: string
+          is_demo: boolean
+          issue_type: string
+          osi_layer: string
+          severity: string
+          show_output: string
+          symptom: string
+          topology: string
+        }
+        Insert: {
+          additional_notes?: string
+          case_id: string
+          concept?: string
+          created_at?: string
+          device_info?: string
+          expected_fault?: string
+          id?: string
+          is_demo?: boolean
+          issue_type?: string
+          osi_layer?: string
+          severity?: string
+          show_output?: string
+          symptom: string
+          topology?: string
+        }
+        Update: {
+          additional_notes?: string
+          case_id?: string
+          concept?: string
+          created_at?: string
+          device_info?: string
+          expected_fault?: string
+          id?: string
+          is_demo?: boolean
+          issue_type?: string
+          osi_layer?: string
+          severity?: string
+          show_output?: string
+          symptom?: string
+          topology?: string
+        }
+        Relationships: []
+      }
+      diagnoses: {
+        Row: {
+          case_id: string
+          concept: string
+          confidence: number
+          created_at: string
+          evidence: string[]
+          fix_steps: string[]
+          id: string
+          model: string
+          next_command: string
+          osi_layer: string
+          raw_response: Json | null
+          root_cause: string
+          severity: string
+        }
+        Insert: {
+          case_id: string
+          concept?: string
+          confidence?: number
+          created_at?: string
+          evidence?: string[]
+          fix_steps?: string[]
+          id?: string
+          model?: string
+          next_command?: string
+          osi_layer?: string
+          raw_response?: Json | null
+          root_cause: string
+          severity?: string
+        }
+        Update: {
+          case_id?: string
+          concept?: string
+          confidence?: number
+          created_at?: string
+          evidence?: string[]
+          fix_steps?: string[]
+          id?: string
+          model?: string
+          next_command?: string
+          osi_layer?: string
+          raw_response?: Json | null
+          root_cause?: string
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnoses_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      responsible_ai_logs: {
+        Row: {
+          case_id: string
+          created_at: string
+          decision: string
+          diagnosis_id: string
+          final_diagnosis: Json | null
+          human_correction: Json | null
+          id: string
+          original_diagnosis: Json
+          reason: string
+          review_id: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          decision: string
+          diagnosis_id: string
+          final_diagnosis?: Json | null
+          human_correction?: Json | null
+          id?: string
+          original_diagnosis: Json
+          reason?: string
+          review_id: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          decision?: string
+          diagnosis_id?: string
+          final_diagnosis?: Json | null
+          human_correction?: Json | null
+          id?: string
+          original_diagnosis?: Json
+          reason?: string
+          review_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responsible_ai_logs_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responsible_ai_logs_diagnosis_id_fkey"
+            columns: ["diagnosis_id"]
+            isOneToOne: false
+            referencedRelation: "diagnoses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responsible_ai_logs_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          case_id: string
+          comment: string
+          correction: Json | null
+          created_at: string
+          decision: string
+          diagnosis_id: string
+          id: string
+          reviewer: string
+        }
+        Insert: {
+          case_id: string
+          comment?: string
+          correction?: Json | null
+          created_at?: string
+          decision: string
+          diagnosis_id: string
+          id?: string
+          reviewer?: string
+        }
+        Update: {
+          case_id?: string
+          comment?: string
+          correction?: Json | null
+          created_at?: string
+          decision?: string
+          diagnosis_id?: string
+          id?: string
+          reviewer?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_diagnosis_id_fkey"
+            columns: ["diagnosis_id"]
+            isOneToOne: false
+            referencedRelation: "diagnoses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rule_check_results: {
+        Row: {
+          case_id: string
+          check_name: string
+          created_at: string
+          engine: string
+          evidence: string
+          explanation: string
+          id: string
+          status: string
+        }
+        Insert: {
+          case_id: string
+          check_name: string
+          created_at?: string
+          engine?: string
+          evidence?: string
+          explanation?: string
+          id?: string
+          status: string
+        }
+        Update: {
+          case_id?: string
+          check_name?: string
+          created_at?: string
+          engine?: string
+          evidence?: string
+          explanation?: string
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rule_check_results_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
