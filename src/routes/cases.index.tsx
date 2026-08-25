@@ -24,7 +24,7 @@ import {
 import { casesQuery, diagnosesQuery, reviewsQuery } from "@/lib/data";
 import { ISSUE_TYPES, SEVERITIES, decisionTone, severityTone } from "@/lib/netsage";
 
-export const Route = createFileRoute("/cases")({
+export const Route = createFileRoute("/cases/")({
   head: () => ({
     meta: [
       { title: "Cases — NetSage AI" },
