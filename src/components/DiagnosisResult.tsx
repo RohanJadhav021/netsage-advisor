@@ -14,7 +14,7 @@ export function RuleCheckList({
   engine,
 }: {
   checks: RuleCheckResult[] | null;
-  engine?: string;
+  engine?: string | undefined;
 }) {
   return (
     <Card>
@@ -60,11 +60,11 @@ export function DiagnosisResult({
   title = "AI diagnosis",
 }: {
   diagnosis: AiDiagnosis;
-  checks?: RuleCheckResult[] | null;
-  checksEngine?: string;
-  onDecision?: (decision: ReviewDecision) => void;
-  footer?: ReactNode;
-  title?: string;
+  checks?: RuleCheckResult[] | null | undefined;
+  checksEngine?: string | undefined;
+  onDecision?: ((decision: ReviewDecision) => void) | undefined;
+  footer?: ReactNode | undefined;
+  title?: string | undefined;
 }) {
   return (
     <div className="space-y-4">
