@@ -1,16 +1,14 @@
 /**
  * Deterministic rule checker (server-only).
  *
- * This module is the reference TypeScript implementation of the SAME API
- * contract implemented by the Python service in `python/rule_checker.py`.
- * If PYTHON_RULE_CHECKER_URL is configured, `runRuleChecks` delegates to the
- * Python service; otherwise it runs these local deterministic checks.
+ * This module is the TypeScript implementation of the rule-check API.
+ * `runRuleChecks` always runs these local deterministic checks; there is no
+ * external/Python rule-checker service.
  *
  * Contract (per check):
  *   { check: string, status: "PASS" | "FAIL" | "WARNING", evidence: string, explanation: string }
  */
 import type { RuleCheckResult } from "./netsage";
-import { ruleCheckResultSchema } from "./netsage";
 
 export type CheckerInput = {
   show_output: string;
@@ -272,46 +270,16 @@ export function runLocalChecks(input: CheckerInput): RuleCheckResult[] {
 }
 
 export type CheckerRun = {
-  engine: "python" | "typescript";
+  engine: "typescript";
   results: RuleCheckResult[];
-  note?: string;
 };
 
 /**
- * Runs the deterministic checks. Prefers the external Python service when
- * PYTHON_RULE_CHECKER_URL is configured (same JSON contract), otherwise falls
- * back to the local TypeScript reference implementation.
+ * Runs the deterministic checks using the local TypeScript implementation.
  */
 export async function runRuleChecks(input: CheckerInput): Promise<CheckerRun> {
-  const url = process.env["PYTHON_RULE_CHECKER_URL"];
-  if (url) {
-    try {
-      const res = await fetch(`${url.replace(/\/$/, "")}/check`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(process.env["PYTHON_RULE_CHECKER_TOKEN"]
-            ? { Authorization: `Bearer ${process.env["PYTHON_RULE_CHECKER_TOKEN"]}` }
-            : {}),
-        },
-        body: JSON.stringify(input),
-      });
-      if (!res.ok) throw new Error(`Python rule checker responded ${res.status}`);
-      const json = (await res.json()) as { results?: unknown };
-      const parsed = ruleCheckResultSchema.array().safeParse(json.results ?? json);
-      if (!parsed.success) throw new Error("Python rule checker returned an unexpected payload");
-      return { engine: "python", results: parsed.data };
-    } catch (error) {
-      return {
-        engine: "typescript",
-        results: runLocalChecks(input),
-        note: `Python rule checker unreachable (${error instanceof Error ? error.message : "unknown error"}). Ran the built-in reference checker instead.`,
-      };
-    }
-  }
   return {
     engine: "typescript",
     results: runLocalChecks(input),
-    note: "PYTHON_RULE_CHECKER_URL is not configured, so the built-in reference implementation of the same checks was used.",
   };
 }

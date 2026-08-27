@@ -84,15 +84,6 @@ function Settings() {
                     : "LOVABLE_API_KEY is not set. New Diagnosis will not be able to produce AI diagnoses until it is configured."
                 }
               />
-              <StatusRow
-                label="Python rule checker"
-                ok={statusRes.data?.pythonCheckerConfigured ?? false}
-                detail={
-                  statusRes.data?.pythonCheckerConfigured
-                    ? "PYTHON_RULE_CHECKER_URL is set — rule checks are delegated to the external Python service."
-                    : "PYTHON_RULE_CHECKER_URL is not set. Rule checks run using the built-in TypeScript reference implementation, which follows the same check contract."
-                }
-              />
             </>
           )}
           <StatusRow

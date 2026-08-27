@@ -39,7 +39,7 @@ const diagnoseInputSchema = caseInputSchema.pick({
   additional_notes: true,
 });
 
-/** Reports whether the AI service and the Python rule checker are configured. */
+/** Reports whether the AI service is configured. */
 export const getServiceStatus = createServerFn({ method: "GET" }).handler(async () => {
   return {
     aiConfigured: Boolean(process.env["GEMINI_API_KEY"]),
@@ -48,7 +48,6 @@ export const getServiceStatus = createServerFn({ method: "GET" }).handler(async 
     // real Gemini call would succeed. A live check is not performed here to keep
     // this endpoint cheap; the Settings UI should communicate this limitation.
     aiConfiguredIsLive: false,
-    pythonCheckerConfigured: Boolean(process.env["PYTHON_RULE_CHECKER_URL"]),
   };
 });
 

@@ -12,6 +12,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Package manager lockfiles (project uses npm; ignore other tools')
+bun.lock
+bun.lockb
+pnpm-lock.yaml
+yarn.lock
+
 node_modules
 dist
 dist-ssr

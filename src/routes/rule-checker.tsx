@@ -58,8 +58,7 @@ function RuleCheckerPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<RuleCheckResult[] | null>(null);
-  const [engine, setEngine] = useState<string | null>(null);
-  const [note, setNote] = useState<string | null>(null);
+const [engine, setEngine] = useState<string | null>(null);
 
   if (!user) {
     return (
@@ -103,7 +102,6 @@ function RuleCheckerPage() {
       });
       setResults(outcome.results);
       setEngine(outcome.engine);
-      setNote(outcome.note ?? null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "The rule checker failed to run.");
     } finally {
@@ -208,11 +206,6 @@ function RuleCheckerPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-0">
-          {note && (
-            <p className="mx-6 mb-3 rounded-md border border-border bg-muted/30 p-2.5 text-xs text-muted-foreground">
-              {note}
-            </p>
-          )}
           {results && results.length > 0 && (
             <Table>
               <TableHeader>
