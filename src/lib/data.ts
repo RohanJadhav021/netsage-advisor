@@ -89,6 +89,53 @@ export function caseQuery(caseId: string) {
   });
 }
 
+export function diagnosisForCaseQuery(caseUuid: string) {
+  return queryOptions({
+    queryKey: ["diagnosis", "case", caseUuid],
+    queryFn: async (): Promise<DiagnosisRow | null> => {
+      const { data, error } = await supabase
+        .from("diagnoses")
+        .select("*")
+        .eq("case_id", caseUuid)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      fail("Could not load the diagnosis for this case", error);
+      return (data as DiagnosisRow | null) ?? null;
+    },
+  });
+}
+
+export function reviewsForCaseQuery(caseUuid: string) {
+  return queryOptions({
+    queryKey: ["reviews", "case", caseUuid],
+    queryFn: async (): Promise<ReviewRow[]> => {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .eq("case_id", caseUuid)
+        .order("created_at", { ascending: false });
+      fail("Could not load reviews for this case", error);
+      return (data ?? []) as ReviewRow[];
+    },
+  });
+}
+
+export function ruleChecksForCaseQuery(caseUuid: string) {
+  return queryOptions({
+    queryKey: ["rule_checks", "case", caseUuid],
+    queryFn: async (): Promise<RuleCheckRow[]> => {
+      const { data, error } = await supabase
+        .from("rule_check_results")
+        .select("*")
+        .eq("case_id", caseUuid)
+        .order("created_at", { ascending: false });
+      fail("Could not load rule check results for this case", error);
+      return (data ?? []) as RuleCheckRow[];
+    },
+  });
+}
+
 export async function createCase(input: CaseInput): Promise<CaseRow> {
   const { data, error } = await supabase.from("cases").insert(input).select("*").single();
   if (error) {
@@ -141,6 +188,7 @@ export async function saveReview(args: {
   correction: AiDiagnosis | null;
   comment: string;
   reviewer: string;
+  reviewerId?: string;
 }): Promise<ReviewRow> {
   const { data, error } = await supabase
     .from("reviews")
@@ -151,6 +199,7 @@ export async function saveReview(args: {
       correction: args.correction,
       comment: args.comment,
       reviewer: args.reviewer,
+      ...(args.reviewerId ? { created_by: args.reviewerId } : {}),
     })
     .select("*")
     .single();

@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
@@ -20,6 +20,7 @@ export type Database = {
           case_id: string
           concept: string
           created_at: string
+          created_by: string | null
           device_info: string
           expected_fault: string
           id: string
@@ -36,6 +37,7 @@ export type Database = {
           case_id: string
           concept?: string
           created_at?: string
+          created_by?: string | null
           device_info?: string
           expected_fault?: string
           id?: string
@@ -52,6 +54,7 @@ export type Database = {
           case_id?: string
           concept?: string
           created_at?: string
+          created_by?: string | null
           device_info?: string
           expected_fault?: string
           id?: string
@@ -71,6 +74,7 @@ export type Database = {
           concept: string
           confidence: number
           created_at: string
+          created_by: string | null
           evidence: string[]
           fix_steps: string[]
           id: string
@@ -86,6 +90,7 @@ export type Database = {
           concept?: string
           confidence?: number
           created_at?: string
+          created_by?: string | null
           evidence?: string[]
           fix_steps?: string[]
           id?: string
@@ -101,6 +106,7 @@ export type Database = {
           concept?: string
           confidence?: number
           created_at?: string
+          created_by?: string | null
           evidence?: string[]
           fix_steps?: string[]
           id?: string
@@ -188,6 +194,7 @@ export type Database = {
           comment: string
           correction: Json | null
           created_at: string
+          created_by: string | null
           decision: string
           diagnosis_id: string
           id: string
@@ -198,6 +205,7 @@ export type Database = {
           comment?: string
           correction?: Json | null
           created_at?: string
+          created_by?: string | null
           decision: string
           diagnosis_id: string
           id?: string
@@ -208,6 +216,7 @@ export type Database = {
           comment?: string
           correction?: Json | null
           created_at?: string
+          created_by?: string | null
           decision?: string
           diagnosis_id?: string
           id?: string

@@ -5,6 +5,7 @@ import {
   FileSearch,
   LayoutDashboard,
   ListChecks,
+  LogOut,
   PlusCircle,
   Settings as SettingsIcon,
   ShieldCheck,
@@ -13,6 +14,7 @@ import {
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -39,6 +41,7 @@ function matchNav(pathname: string) {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const current = matchNav(pathname);
+  const { user, signOut } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -91,6 +94,18 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Button asChild size="sm">
                 <Link to="/new-diagnosis">New diagnosis</Link>
               </Button>
+              {user && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => signOut()}
+                  title="Sign out"
+                  className="gap-1.5"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span className="max-w-[140px] truncate">{user.email ?? "Sign out"}</span>
+                </Button>
+              )}
             </div>
           </div>
           <nav className="flex gap-1 overflow-x-auto border-t border-border px-3 py-2 md:hidden">

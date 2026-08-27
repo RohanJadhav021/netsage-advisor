@@ -4,11 +4,15 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { AppShell } from "@/components/AppShell";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider, useAuth } from "@/lib/auth-context";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -118,9 +122,51 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <GuardedApp />
+        <Toaster position="bottom-right" />
+      </QueryClientProvider>
+    </AuthProvider>
+  );
+}
+
+function LoadingScreen() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
+      <div className="text-sm">Loading…</div>
+    </div>
+  );
+}
+
+function GuardedApp() {
+  const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (loading) return;
+    const isLogin = pathname === "/login";
+    if (!user && !isLogin) {
+      router.navigate({ to: "/login" });
+    }
+  }, [user, loading, pathname, router]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!user && pathname === "/login") {
+    return (
+      <div className="min-h-screen bg-background">
+        <Outlet />
+      </div>
+    );
+  }
+
+  return (
+    <AppShell>
       <Outlet />
-    </QueryClientProvider>
+    </AppShell>
   );
 }

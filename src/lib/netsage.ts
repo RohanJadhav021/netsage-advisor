@@ -90,6 +90,7 @@ export type CaseRow = {
   concept: string;
   severity: string;
   is_demo: boolean;
+  created_by: string | null;
   created_at: string;
 };
 
@@ -105,6 +106,7 @@ export type DiagnosisRow = {
   severity: string;
   concept: string;
   model: string;
+  created_by: string | null;
   created_at: string;
 };
 
@@ -116,6 +118,7 @@ export type ReviewRow = {
   correction: AiDiagnosis | null;
   comment: string;
   reviewer: string;
+  created_by: string | null;
   created_at: string;
 };
 

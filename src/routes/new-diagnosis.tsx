@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createCase, saveDiagnosis, saveRuleChecks } from "@/lib/data";
+import { useAuth } from "@/lib/auth-context";
 import { diagnoseCase, runChecks } from "@/lib/netsage.functions";
 import {
   caseInputSchema,
@@ -55,10 +56,27 @@ function NewDiagnosis() {
   const [savedRow, setSavedRow] = useState<DiagnosisRow | null>(null);
   const [checks, setChecks] = useState<RuleCheckResult[] | null>(null);
   const [decision, setDecision] = useState<ReviewDecision | null>(null);
+  const { user } = useAuth();
 
   const queryClient = useQueryClient();
   const diagnose = useServerFn(diagnoseCase);
   const check = useServerFn(runChecks);
+
+  if (!user) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
+          <div className="text-base font-semibold">Please sign in</div>
+          <p className="max-w-md text-sm text-muted-foreground">
+            AI diagnoses and rule checks require an authenticated session.
+          </p>
+          <Button asChild>
+            <Link to="/login">Sign in</Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   function set<K extends keyof typeof EMPTY>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -97,8 +115,8 @@ function NewDiagnosis() {
             topology: parsed.data.topology,
           },
         });
-        setChecks(checkResults);
-        await saveRuleChecks(caseRow.id, checkResults, "builtin");
+        setChecks(checkResults.results);
+        await saveRuleChecks(caseRow.id, checkResults.results, checkResults.engine);
       } catch (e) {
         toast.warning(
           `Diagnosis saved, but the rule checker failed: ${e instanceof Error ? e.message : "unknown error"}`,

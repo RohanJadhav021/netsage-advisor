@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 import { saveReview } from "@/lib/data";
 import type { AiDiagnosis, DiagnosisRow, ReviewDecision } from "@/lib/netsage";
 
@@ -29,6 +30,7 @@ export function ReviewDialog({
 }) {
   const [comment, setComment] = useState("");
   const [reviewer, setReviewer] = useState("Reviewer");
+  const [reviewerId, setReviewerId] = useState<string | null>(null);
   const [rootCause, setRootCause] = useState("");
   const [severity, setSeverity] = useState("");
   const [osiLayer, setOsiLayer] = useState("");
@@ -37,6 +39,29 @@ export function ReviewDialog({
   const [error, setError] = useState<string | null>(null);
 
   const open = Boolean(diagnosis && decision);
+
+  useEffect(() => {
+    if (!open) return;
+    let active = true;
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (!active) return;
+        const user = data.user;
+        setReviewerId(user?.id ?? null);
+        setReviewer(
+          user?.email ??
+            (user?.user_metadata?.["full_name"] as string | undefined) ??
+            "Reviewer",
+        );
+      })
+      .catch(() => {
+        if (active) setReviewer("Reviewer");
+      });
+    return () => {
+      active = false;
+    };
+  }, [open]);
 
   function reset() {
     setComment("");
@@ -82,6 +107,7 @@ export function ReviewDialog({
         correction,
         comment: comment.trim(),
         reviewer: reviewer.trim() || "Reviewer",
+        ...(reviewerId ? { reviewerId } : {}),
       });
       toast.success(`Review saved as ${decision}. The original AI diagnosis is unchanged.`);
       reset();
@@ -115,7 +141,10 @@ export function ReviewDialog({
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="reviewer">Reviewer</Label>
-            <Input id="reviewer" value={reviewer} onChange={(e) => setReviewer(e.target.value)} />
+            <Input id="reviewer" value={reviewer} readOnly />
+            <p className="text-xs text-muted-foreground">
+              The reviewer is set automatically from your signed-in account and cannot be edited.
+            </p>
           </div>
 
           {decision === "EDITED" && (
